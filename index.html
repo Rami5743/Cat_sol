@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>סוליטר מילים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="board">
+  <header class="masthead">
+    <div class="brand">
+      <h1>סוליטר מילים</h1>
+      <p class="tagline">עשר קטגוריות. המטרה לרוקן את הלוח כולו.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="stat-label">מהלכים</span><span class="stat-value" id="stat-moves">0</span></div>
+      <div class="stat"><span class="stat-label">זמן</span><span class="stat-value" id="stat-time">0:00</span></div>
+      <div class="stat stat-err"><span class="stat-label">טעויות</span><span class="stat-value" id="stat-errors">0</span></div>
+    </div>
+  </header>
+
+  <section class="band">
+    <div class="zone zone-foundations">
+      <h2 class="zone-title">קטגוריות פתוחות</h2>
+      <div class="slots" id="foundations"></div>
+    </div>
+    <div class="zone zone-hold">
+      <h2 class="zone-title">ערמת המתנה</h2>
+      <div class="slots" id="holding"></div>
+    </div>
+  </section>
+
+  <section class="zone zone-tableau">
+    <h2 class="zone-title">הלוח</h2>
+    <div class="tableau" id="tableau"></div>
+  </section>
+
+  <div class="controls">
+    <button type="button" id="btn-undo">ביטול מהלך</button>
+    <button type="button" id="btn-restart">אותה חלוקה מחדש</button>
+    <button type="button" id="btn-new">חלוקה חדשה</button>
+  </div>
+
+  <details class="rules">
+    <summary>חוקי המשחק</summary>
+    <ul>
+      <li>על כל קלף כתובה מילה. קלף קטגוריה כהה, ומתחת לשמה מופיע מספר המילים שבה.</li>
+      <li>בכל ערמה בלוח חשוף רק הקלף העליון.</li>
+      <li>למקום פנוי למעלה אפשר להעביר רק קלף קטגוריה.</li>
+      <li>על קלף קטגוריה מניחים רק מילים מאותה קטגוריה.</li>
+      <li>על מילה אפשר להניח מילה אחרת מאותה קטגוריה, למעלה או בלוח.</li>
+      <li>לערמת ההמתנה אפשר להעביר כל קלף, אך זמין בה רק הקלף העליון.</li>
+      <li>קטגוריה שהושלמה למעלה יורדת מהלוח, והמקום מתפנה לקטגוריה הבאה.</li>
+      <li>מקישים על קלף ואז על היעד. ניסיון להניח קלף במקום שאינו חוקי נספר כטעות.</li>
+      <li>המטרה היא לרוקן את הלוח כולו.</li>
+    </ul>
+  </details>
+</div>
+
+<div class="win" id="win" hidden>
+  <div class="win-card">
+    <h2>הלוח ריק</h2>
+    <p>כל עשר הקטגוריות נסגרו.</p>
+    <div class="win-stats">
+      <div class="stat"><span class="stat-label">מהלכים</span><span class="stat-value" id="win-moves">0</span></div>
+      <div class="stat"><span class="stat-label">זמן</span><span class="stat-value" id="win-time">0:00</span></div>
+      <div class="stat stat-err"><span class="stat-label">טעויות</span><span class="stat-value" id="win-errors">0</span></div>
+    </div>
+    <button type="button" id="btn-again">חלוקה חדשה</button>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
