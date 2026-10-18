@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>בדיקת הכהיה</title>
+<style>
+/* הדף הזה בכוונה אינו מצהיר דבר על סכמות צבע, כדי שההכהיה תחול עליו
+   ונראה אילו טכניקות שורדות אותה. */
+body { margin: 0; font-family: system-ui, sans-serif; background: #ffffff; color: #000000; }
+.wrap { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.row { border: 2px solid #888; border-radius: 6px; overflow: hidden; }
+.cap { font-size: 13px; padding: 4px 8px; background: #dddddd; color: #000000; }
+.box { height: 54px; display: grid; place-items: center; font-size: 15px; font-weight: 700; }
+.b1 { background-color: #ffffff; color: #000000; }
+.b2 { background-image: linear-gradient(#ffffff, #ffffff); color: #000000; }
+.b3 { background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23ffffff'/%3E%3C/svg%3E"); background-size: cover; color: #000000; }
+.b4 { color-scheme: only light; background-color: #ffffff; color: #000000; }
+.b5 { background-color: #ffffff; color: #000000; forced-color-adjust: none; }
+.b6 { background-color: #8a2b23; color: #fbeeeb; }
+.b7 { filter: invert(1); background-color: #000000; color: #ffffff; }
+.info { font-size: 13px; line-height: 1.6; background: #eeeeee; color: #000; padding: 10px; border-radius: 6px; word-break: break-all; }
+img { display: block; width: 100%; height: 54px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="row"><div class="cap">1 · רקע לבן רגיל</div><div class="box b1">לבן</div></div>
+  <div class="row"><div class="cap">2 · רקע לבן כמדרג</div><div class="box b2">לבן</div></div>
+  <div class="row"><div class="cap">3 · רקע לבן כתמונה</div><div class="box b3">לבן</div></div>
+  <div class="row"><div class="cap">4 · רקע לבן עם הכרזת "רק בהיר"</div><div class="box b4">לבן</div></div>
+  <div class="row"><div class="cap">5 · רקע לבן עם איסור התאמת צבע</div><div class="box b5">לבן</div></div>
+  <div class="row"><div class="cap">6 · אדום כהה עם כתב בהיר</div><div class="box b6">אדום</div></div>
+  <div class="row"><div class="cap">7 · שחור עם היפוך נגדי</div><div class="box b7">אמור להיראות לבן</div></div>
+  <div class="row"><div class="cap">8 · תמונת לבן ממש</div>
+    <img alt="" src="data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='8'%3E%3Crect width='40' height='8' fill='%23ffffff'/%3E%3C/svg%3E"></div>
+  <div class="info" id="info"></div>
+</div>
+<script>
+var d = [
+  'דפדפן: ' + navigator.userAgent,
+  'מעדיף כהה: ' + matchMedia('(prefers-color-scheme: dark)').matches,
+  'מעדיף בהיר: ' + matchMedia('(prefers-color-scheme: light)').matches,
+  'ניגודיות מוגברת: ' + matchMedia('(prefers-contrast: more)').matches,
+  'צבעים כפויים: ' + matchMedia('(forced-colors: active)').matches,
+  'ההכהיה הפוכה: ' + matchMedia('(inverted-colors: inverted)').matches,
+  'רוחב: ' + innerWidth + ' · צפיפות: ' + devicePixelRatio
+];
+document.getElementById('info').textContent = d.join(' | ');
+</script>
+</body>
+</html>
