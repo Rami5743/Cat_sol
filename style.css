@@ -24,49 +24,51 @@
   --ch: calc(var(--cw) * 1.4);          /* פרופורציה של קלף סטנדרטי */
   --fan-down: calc(var(--ch) * 0.1);
   --fan-up: calc(var(--ch) * 0.34);
+  --fs-card: calc(var(--cw) * 0.165);
+  --fs-count: calc(var(--cw) * 0.145);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --felt: #1b1211;
-    --felt-edge: #120b0a;
-    --panel: #271b19;
-    --ink: #ece1de;
-    --muted: #a28b87;
-    --paper: #e0d8d1;
-    --paper-ink: #1d1614;
-    --paper-edge: #b9aba2;
-    --cat: #a53b2f;
-    --cat-ink: #fdf1ef;
-    --cat-edge: #7a271d;
-    --back: #4d2d29;
-    --back-line: #5f3a35;
-    --back-edge: #2a1614;
-    --ghost-edge: #45302c;
-    --accent: #e0a75c;
-    --danger: #ea7a60;
+    --felt: #3a2926;
+    --felt-edge: #2a1d1b;
+    --panel: #4a3531;
+    --ink: #f6eeea;
+    --muted: #c4aaa4;
+    --paper: #f4ece4;
+    --paper-ink: #241b18;
+    --paper-edge: #cabdb2;
+    --cat: #b2463a;
+    --cat-ink: #fdf3f0;
+    --cat-edge: #8a3127;
+    --back: #85564f;
+    --back-line: #99665e;
+    --back-edge: #5c372f;
+    --ghost-edge: #6e524c;
+    --accent: #eeb268;
+    --danger: #f58a71;
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --felt: #1b1211;
-  --felt-edge: #120b0a;
-  --panel: #271b19;
-  --ink: #ece1de;
-  --muted: #a28b87;
-  --paper: #e0d8d1;
-  --paper-ink: #1d1614;
-  --paper-edge: #b9aba2;
-  --cat: #a53b2f;
-  --cat-ink: #fdf1ef;
-  --cat-edge: #7a271d;
-  --back: #4d2d29;
-  --back-line: #5f3a35;
-  --back-edge: #2a1614;
-  --ghost-edge: #45302c;
-  --accent: #e0a75c;
-  --danger: #ea7a60;
+  --felt: #3a2926;
+  --felt-edge: #2a1d1b;
+  --panel: #4a3531;
+  --ink: #f6eeea;
+  --muted: #c4aaa4;
+  --paper: #f4ece4;
+  --paper-ink: #241b18;
+  --paper-edge: #cabdb2;
+  --cat: #b2463a;
+  --cat-ink: #fdf3f0;
+  --cat-edge: #8a3127;
+  --back: #85564f;
+  --back-line: #99665e;
+  --back-edge: #5c372f;
+  --ghost-edge: #6e524c;
+  --accent: #eeb268;
+  --danger: #f58a71;
   color-scheme: dark;
 }
 
@@ -98,7 +100,7 @@ body {
 /* ---------- התפריט ---------- */
 
 .menu {
-  min-height: 100%;
+  min-height: 80vh;
   display: grid;
   place-items: center;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
@@ -474,7 +476,7 @@ h1 {
 }
 
 .card-text {
-  font-size: calc(var(--cw) * 0.165);
+  font-size: var(--fs-card);
   font-weight: 500;
   line-height: 1.16;
   text-align: start;
@@ -496,7 +498,7 @@ h1 {
 
 .card-count {
   flex: none;
-  font-size: calc(var(--cw) * 0.145);
+  font-size: var(--fs-count);
   line-height: 1.3;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -644,4 +646,30 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   justify-content: center;
   gap: 10px;
   margin-bottom: 18px;
+}
+
+/* ---------- טלפון: ארבעה טורים, אות גדולה יותר, ומרווחים צרים ---------- */
+
+@media (max-width: 520px) {
+  :root {
+    --cw: calc((100vw - 60px) / 4);
+    --fs-card: calc(var(--cw) * 0.205);
+    --fs-count: calc(var(--cw) * 0.165);
+    --fan-up: calc(var(--ch) * 0.43);
+    --fan-down: calc(var(--ch) * 0.09);
+  }
+
+  .board { gap: 12px; padding-block: 12px 26px; }
+  .masthead { padding-bottom: 10px; }
+  .band { gap: 10px 14px; }
+  .slots { gap: 8px; }
+  .deck-row { gap: 8px; }
+  .tableau { gap: 10px 8px; }
+  .zone-tableau { padding-top: 12px; }
+  h1 { font-size: 22px; }
+  .stat { min-width: 58px; padding: 5px 8px 6px; }
+  .stat-value { font-size: 18px; }
+  .hint-btn { font-size: 15px; padding-inline: 11px; }
+  .controls { gap: 6px; }
+  .controls button { font-size: 12.5px; padding: 6px 11px; }
 }
