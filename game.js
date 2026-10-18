@@ -5,6 +5,7 @@
   var BANKS = window.WordSolContent.BANKS;
   var TEXT = window.WordSolContent.TEXT;
   var D = window.WordSolDeal;
+  var GLOSS = window.WordSolGloss;
   var SLOTS = 4;
 
   /* ---------- בחירה בתפריט ---------- */
@@ -68,6 +69,7 @@
       found: [null, null, null, null],
       moves: 0,
       errors: 0,
+      hints: 0,
       active: false,
       since: 0,
       elapsed: 0,
@@ -275,6 +277,9 @@
   var elMoves = document.getElementById('stat-moves');
   var elTime = document.getElementById('stat-time');
   var elErrors = document.getElementById('stat-errors');
+  var elHints = document.getElementById('stat-hints');
+  var bubble = document.getElementById('bubble');
+  var hintBtn = document.getElementById('btn-hint');
   var elWin = document.getElementById('win');
   var board = elGame;
 
@@ -327,6 +332,114 @@
 
   function reject(dest) { flash(dest); buzz(); shake(); }
 
+
+  /* ---------- רמז ---------- */
+
+  var hintArmed = false;
+  var hintDrag = null;
+  var bubbleTimer = null;
+
+  function paintHint() {
+    hintBtn.classList.toggle('is-on', hintArmed);
+    hintBtn.setAttribute('aria-pressed', hintArmed ? 'true' : 'false');
+  }
+
+  function hideBubble() {
+    bubble.hidden = true;
+    if (bubbleTimer) { clearTimeout(bubbleTimer); bubbleTimer = null; }
+  }
+
+  function showBubble(node, word, meaning) {
+    bubble.innerHTML = '';
+    var w = document.createElement('strong');
+    w.textContent = word;
+    var m = document.createElement('span');
+    m.textContent = meaning;
+    bubble.appendChild(w);
+    bubble.appendChild(m);
+    bubble.dir = T.dir;
+    bubble.hidden = false;
+
+    var r = node.getBoundingClientRect();
+    var bw = bubble.offsetWidth, bh = bubble.offsetHeight;
+    var left = Math.min(Math.max(8, r.left + r.width / 2 - bw / 2), window.innerWidth - bw - 8);
+    var top = r.top - bh - 8;
+    if (top < 8) top = Math.min(r.bottom + 8, window.innerHeight - bh - 8);
+    bubble.style.left = Math.max(8, left) + 'px';
+    bubble.style.top = Math.max(8, top) + 'px';
+
+    if (bubbleTimer) clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(hideBubble, 8000);
+  }
+
+  function revealHint(node) {
+    if (!state || state.won || !node || node.classList.contains('card--back')) return;
+    var label = node.querySelector('.card-text');
+    if (!label) return;
+    var word = label.textContent;
+    var meaning = GLOSS[choice.lang] && GLOSS[choice.lang][word];
+    if (!meaning) return;                 // קלף קטגוריה, ששמו מדבר בעד עצמו
+    state.hints++;
+    startClock();
+    paintStats();
+    showBubble(node, word, meaning);
+  }
+
+  hintBtn.addEventListener('pointerdown', function (ev) {
+    if (!state || state.won) return;
+    hintDrag = { x0: ev.clientX, y0: ev.clientY, moved: false, ghost: null };
+    try { hintBtn.setPointerCapture(ev.pointerId); } catch (e) { /* לא קריטי */ }
+  });
+
+  document.addEventListener('pointermove', function (ev) {
+    if (!hintDrag) return;
+    var dx = ev.clientX - hintDrag.x0, dy = ev.clientY - hintDrag.y0;
+    if (!hintDrag.moved) {
+      if (Math.abs(dx) + Math.abs(dy) < 6) return;
+      hintDrag.moved = true;
+      var r = hintBtn.getBoundingClientRect();
+      var g = hintBtn.cloneNode(true);
+      g.className = 'stat hint-btn drag-ghost';
+      g.style.width = r.width + 'px';
+      g.style.height = r.height + 'px';
+      g.style.left = r.left + 'px';
+      g.style.top = r.top + 'px';
+      document.body.appendChild(g);
+      hintDrag.ghost = g;
+      hintBtn.classList.add('is-lifted');
+    }
+    hintDrag.ghost.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+  });
+
+  document.addEventListener('pointerup', function (ev) {
+    if (!hintDrag) return;
+    var d = hintDrag;
+    hintDrag = null;
+    if (d.ghost) { d.ghost.remove(); hintBtn.classList.remove('is-lifted'); }
+    if (d.moved) {
+      var under = document.elementFromPoint(ev.clientX, ev.clientY);
+      var card = under && under.closest ? under.closest('.card') : null;
+      if (card) revealHint(card);
+      return;
+    }
+    hintArmed = !hintArmed;
+    paintHint();
+  });
+
+  /* בשלב הלכידה, כדי שהקשה על קלף במצב רמז לא תיקרא גם כבחירת קלף */
+  document.addEventListener('pointerdown', function (ev) {
+    hideBubble();
+    if (!hintArmed || ev.target.closest('#btn-hint')) return;
+    hintArmed = false;
+    paintHint();
+    var card = ev.target.closest('.card');
+    if (card && !card.classList.contains('card--back')) {
+      revealHint(card);
+      ev.stopPropagation();
+      ev.preventDefault();
+    }
+  }, true);
+
   /* ---------- תצוגת הלוח ---------- */
 
   function cardEl(card, faceUp, draggable) {
@@ -354,6 +467,7 @@
     elMoves.textContent = state.moves;
     elTime.textContent = clockText(elapsedNow());
     elErrors.textContent = state.errors;
+    elHints.textContent = state.hints;
   }
 
   function renderFoundations() {
@@ -596,7 +710,13 @@
   });
 
   document.addEventListener('keydown', function (ev) {
-    if (ev.key === 'Escape') { closePop(); selected = null; if (state) render(); return; }
+    if (ev.key === 'Escape') {
+      closePop(); hideBubble();
+      if (hintArmed) { hintArmed = false; paintHint(); }
+      selected = null;
+      if (state) render();
+      return;
+    }
     if (ev.key !== 'Enter' && ev.key !== ' ') return;
     var node = document.activeElement;
     if (node && node.dataset && node.dataset.kind === 'stock') { ev.preventDefault(); drawFromStock(); }
@@ -676,6 +796,9 @@
     text('lbl-moves', T.moves);
     text('lbl-time', T.time);
     text('lbl-errors', T.errors);
+    text('lbl-hints', T.hints);
+    text('wlbl-hints', T.hints);
+    hintBtn.textContent = T.hint;
     text('wlbl-moves', T.moves);
     text('wlbl-time', T.time);
     text('wlbl-errors', T.errors);
@@ -695,6 +818,9 @@
 
   function showMenu() {
     closePop();
+    hideBubble();
+    hintArmed = false;
+    paintHint();
     stopClock();
     selected = null;
     elWin.hidden = true;
@@ -705,6 +831,9 @@
 
   function begin(seed) {
     closePop();
+    hideBubble();
+    hintArmed = false;
+    paintHint();
     stopClock();
     state = newState(seed);
     history = [];
@@ -775,6 +904,7 @@
     document.getElementById('win-moves').textContent = state.moves;
     document.getElementById('win-time').textContent = clockText(elapsedNow());
     document.getElementById('win-errors').textContent = state.errors;
+    document.getElementById('win-hints').textContent = state.hints;
     elWin.hidden = false;
   }
 
@@ -815,7 +945,8 @@
           lang: choice.lang, level: choice.level,
           names: SET.map(function (c) { return c.name; }),
           seed: state.seed, snap: snapshot(),
-          errors: state.errors, elapsed: elapsedNow(), won: state.won
+          errors: state.errors, hints: state.hints,
+          elapsed: elapsedNow(), won: state.won
         }
       };
     });

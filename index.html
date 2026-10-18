@@ -42,6 +42,8 @@
       <div class="stat"><span class="stat-label" id="lbl-moves"></span><span class="stat-value" id="stat-moves">0</span></div>
       <div class="stat"><span class="stat-label" id="lbl-time"></span><span class="stat-value" id="stat-time">0:00</span></div>
       <div class="stat stat-err"><span class="stat-label" id="lbl-errors"></span><span class="stat-value" id="stat-errors">0</span></div>
+      <div class="stat"><span class="stat-label" id="lbl-hints"></span><span class="stat-value" id="stat-hints">0</span></div>
+      <button type="button" class="stat hint-btn" id="btn-hint" aria-pressed="false"></button>
     </div>
   </header>
 
@@ -89,6 +91,7 @@
       <div class="stat"><span class="stat-label" id="wlbl-moves"></span><span class="stat-value" id="win-moves">0</span></div>
       <div class="stat"><span class="stat-label" id="wlbl-time"></span><span class="stat-value" id="win-time">0:00</span></div>
       <div class="stat stat-err"><span class="stat-label" id="wlbl-errors"></span><span class="stat-value" id="win-errors">0</span></div>
+      <div class="stat"><span class="stat-label" id="wlbl-hints"></span><span class="stat-value" id="win-hints">0</span></div>
     </div>
     <div class="controls controls--centred">
       <button type="button" id="btn-win-words"></button>
@@ -97,7 +100,10 @@
     </div>
   </div>
 </div>
+
+<div class="bubble" id="bubble" hidden></div>
 <script src="banks.js"></script>
+<script src="glosses.js"></script>
 <script src="deal.js"></script>
 <script src="game.js"></script>
 </body>
