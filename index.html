@@ -10,15 +10,38 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="board" dir="rtl">
-  <header class="masthead">
-    <div class="brand">
-      <h1>סוליטר מילים</h1>
+<div class="menu" id="menu">
+  <div class="menu-card">
+    <h1 id="menu-title"></h1>
+    <p class="menu-lead" id="menu-lead"></p>
+
+    <div class="choice">
+      <span class="choice-label" id="lang-label"></span>
+      <div class="options" id="opt-lang"></div>
     </div>
+
+    <div class="choice">
+      <span class="choice-label" id="level-label"></span>
+      <div class="options" id="opt-level"></div>
+      <p class="choice-hint" id="level-hint"></p>
+    </div>
+
+    <button type="button" class="primary" id="btn-start"></button>
+
+    <details class="rules" id="menu-rules">
+      <summary></summary>
+      <ul></ul>
+    </details>
+  </div>
+</div>
+
+<div class="board" id="game" hidden>
+  <header class="masthead">
+    <h1 id="game-title"></h1>
     <div class="stats">
-      <div class="stat"><span class="stat-label">מהלכים</span><span class="stat-value" id="stat-moves">0</span></div>
-      <div class="stat"><span class="stat-label">זמן</span><span class="stat-value" id="stat-time">0:00</span></div>
-      <div class="stat stat-err"><span class="stat-label">טעויות</span><span class="stat-value" id="stat-errors">0</span></div>
+      <div class="stat"><span class="stat-label" id="lbl-moves"></span><span class="stat-value" id="stat-moves">0</span></div>
+      <div class="stat"><span class="stat-label" id="lbl-time"></span><span class="stat-value" id="stat-time">0:00</span></div>
+      <div class="stat stat-err"><span class="stat-label" id="lbl-errors"></span><span class="stat-value" id="stat-errors">0</span></div>
     </div>
   </header>
 
@@ -39,44 +62,38 @@
   </section>
 
   <div class="controls">
-    <button type="button" id="btn-undo">ביטול מהלך</button>
-    <button type="button" id="btn-restart">אותה חלוקה מחדש</button>
-    <button type="button" id="btn-new">חלוקה חדשה</button>
-    <button type="button" id="btn-sound" class="btn-toggle" aria-pressed="true">צליל פועל</button>
+    <button type="button" id="btn-undo"></button>
+    <button type="button" id="btn-same-deal"></button>
+    <button type="button" id="btn-same-words"></button>
+    <button type="button" id="btn-new-set"></button>
+    <button type="button" id="btn-menu"></button>
+    <button type="button" id="btn-sound" class="btn-toggle" aria-pressed="true"></button>
   </div>
 
-  <details class="rules">
-    <summary>חוקי המשחק</summary>
-    <ul>
-      <li>על כל קלף כתובה מילה. קלף קטגוריה כהה, ולצד שמו מופיע מספר המילים שבקטגוריה.</li>
-      <li>בלוח שמונה ערמות בגדלים שונים. בכל ערמה חשוף בתחילה רק הקלף העליון, וקלף שנחשף נשאר גלוי.</li>
-      <li>החפיסה מחזיקה, הפוכים, את כל הקלפים שאינם בלוח ואינם באחת מארבע הקטגוריות הפתוחות. לחיצה עליה חושפת קלף אל ערמת הגלויים שלצדה, והוא מכסה את הקלף שנחשף לפניו.</li>
-      <li>זמין לשימוש רק הקלף העליון בערמת הגלויים. מה שמתחתיו נפתח רק אחרי שהעליון יורד ממנה. אי אפשר להניח קלף בחפיסה או בגלויים.</li>
-      <li>כשהחפיסה מתרוקנת, הלחיצה הבאה עליה מחזירה אליה את הגלויים ומתחילה סיבוב נוסף.</li>
-      <li>למקום פנוי למעלה אפשר להעביר רק קלף קטגוריה.</li>
-      <li>על קלף קטגוריה מניחים רק מילים מאותה קטגוריה.</li>
-      <li>על מילה אפשר להניח מילה אחרת מאותה קטגוריה, בין למעלה ובין בלוח.</li>
-      <li>רצף של קלפים גלויים בערמה הוא תמיד מקטגוריה אחת, ואפשר להעביר אותו בשלמותו: אוחזים בקלף הגלוי התחתון שברצף וגוררים את כולו.</li>
-      <li>ערמה בלוח שהתרוקנה פנויה לכל קלף או רצף.</li>
-      <li>קטגוריה שהושלמה יורדת מהלוח, והמקום מתפנה לקטגוריה הבאה.</li>
-      <li>גוררים קלף אל היעד, או מקישים על קלף ואחר כך על היעד. ניסיון להניח קלף במקום שאינו חוקי מרעיד את הלוח, משמיע צליל, ונספר כטעות.</li>
-      <li>חשיפת קלף מהחפיסה נספרת אף היא כמהלך.</li>
-    </ul>
+  <details class="rules" id="game-rules">
+    <summary></summary>
+    <ul></ul>
   </details>
 </div>
 
-<div class="win" id="win" dir="rtl" hidden>
+<div class="win" id="win" hidden>
   <div class="win-card">
-    <h2>הלוח ריק</h2>
-    <p>כל עשר הקטגוריות נסגרו.</p>
+    <h2 id="win-title"></h2>
+    <p id="win-text"></p>
     <div class="win-stats">
-      <div class="stat"><span class="stat-label">מהלכים</span><span class="stat-value" id="win-moves">0</span></div>
-      <div class="stat"><span class="stat-label">זמן</span><span class="stat-value" id="win-time">0:00</span></div>
-      <div class="stat stat-err"><span class="stat-label">טעויות</span><span class="stat-value" id="win-errors">0</span></div>
+      <div class="stat"><span class="stat-label" id="wlbl-moves"></span><span class="stat-value" id="win-moves">0</span></div>
+      <div class="stat"><span class="stat-label" id="wlbl-time"></span><span class="stat-value" id="win-time">0:00</span></div>
+      <div class="stat stat-err"><span class="stat-label" id="wlbl-errors"></span><span class="stat-value" id="win-errors">0</span></div>
     </div>
-    <button type="button" id="btn-again">חלוקה חדשה</button>
+    <div class="controls controls--centred">
+      <button type="button" id="btn-win-words"></button>
+      <button type="button" class="primary" id="btn-win-set"></button>
+      <button type="button" id="btn-win-menu"></button>
+    </div>
   </div>
 </div>
+<script src="banks.js"></script>
+<script src="deal.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

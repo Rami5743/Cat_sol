@@ -1,197 +1,74 @@
-/* סוליטר מילים — לוגיקת המשחק */
+/* סוליטר מילים — תפריט, מצב המשחק, וממשק הלוח */
 (function () {
   'use strict';
 
-  var CATEGORIES = [
-    { name: 'פירות',       words: ['תפוח', 'בננה', 'ענבים', 'אגס'] },
-    { name: 'צבעים',       words: ['אדום', 'כחול', 'ירוק', 'צהוב', 'סגול'] },
-    { name: 'חיות',        words: ['כלב', 'חתול', 'סוס', 'פיל', 'זברה', 'נמר'] },
-    { name: 'ערים',        words: ['ירושלים', 'חיפה', 'אילת', 'צפת', 'טבריה'] },
-    { name: 'כלי נגינה',   words: ['כינור', 'חליל', 'תוף', 'פסנתר'] },
-    { name: 'ימות השבוע',  words: ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'] },
-    { name: 'מקצועות',     words: ['רופא', 'מורה', 'נגר', 'טייס', 'שופט'] },
-    { name: 'ירקות',       words: ['גזר', 'מלפפון', 'עגבנייה', 'בצל', 'חסה', 'קישוא'] },
-    { name: 'תחבורה',      words: ['אופניים', 'אוטובוס', 'רכבת'] },
-    { name: 'רהיטים',      words: ['שולחן', 'כיסא', 'ספה', 'מיטה', 'ארון', 'כוננית', 'שידה', 'כורסה'] }
-  ];
-
-  var TAB_SIZES = [1, 2, 3, 4, 5, 6, 7, 8];   // 36 קלפים בלוח, 27 בחפיסה
+  var BANKS = window.WordSolContent.BANKS;
+  var TEXT = window.WordSolContent.TEXT;
+  var D = window.WordSolDeal;
   var SLOTS = 4;
 
-  /* ---------- חפיסה ---------- */
+  /* ---------- בחירה בתפריט ---------- */
 
-  var DECK = [];
-  (function buildDeck() {
-    var id = 0;
-    CATEGORIES.forEach(function (cat, ci) {
-      DECK.push({ id: id++, type: 'cat', cat: ci, text: cat.name });
-      cat.words.forEach(function (w) {
-        DECK.push({ id: id++, type: 'word', cat: ci, text: w });
-      });
-    });
-  })();
+  var choice = { lang: 'he', level: 'easy' };
+  try {
+    var saved = JSON.parse(localStorage.getItem('wordsol-choice') || 'null');
+    if (saved && BANKS[saved.lang] && BANKS[saved.lang][saved.level]) choice = saved;
+  } catch (e) { /* ברירת המחדל */ }
 
-  function size(ci) { return CATEGORIES[ci].words.length; }
+  var T = TEXT[choice.lang];
 
-  /* ---------- אקראיות עם זרע ---------- */
-
-  function rngFrom(seed) {
-    var a = seed >>> 0;
-    return function () {
-      a |= 0; a = (a + 0x6D2B79F5) | 0;
-      var t = Math.imul(a ^ (a >>> 15), 1 | a);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
+  function rememberChoice() {
+    try { localStorage.setItem('wordsol-choice', JSON.stringify(choice)); } catch (e) { /* לא נורא */ }
   }
 
-  function shuffled(list, rnd) {
-    var a = list.slice();
-    for (var i = a.length - 1; i > 0; i--) {
-      var j = Math.floor(rnd() * (i + 1));
-      var t = a[i]; a[i] = a[j]; a[j] = t;
+  /* ---------- הסט הפעיל ---------- */
+
+  var SET = null, DECK = null;
+
+  function sizeOf(ci) { return SET[ci].words.length; }
+
+  function drawNewSet() {
+    var rnd = D.rngFrom((Math.random() * 0xffffffff) >>> 0);
+    SET = D.drawSet(BANKS[choice.lang][choice.level], rnd);
+    DECK = D.buildDeck(SET);
+  }
+
+  function setFromNames(lang, level, names) {
+    var bank = BANKS[lang] && BANKS[lang][level];
+    if (!bank) return null;
+    var out = [];
+    for (var i = 0; i < names.length; i++) {
+      var found = null;
+      for (var j = 0; j < bank.length; j++) if (bank[j].name === names[i]) found = bank[j];
+      if (!found) return null;
+      out.push(found);
     }
-    return a;
+    return out;
   }
 
-  function deal(seed) {
-    var cards = shuffled(DECK, rngFrom(seed));
-    var tab = [], k = 0;
-    TAB_SIZES.forEach(function (n) {
-      tab.push({ cards: cards.slice(k, k + n), down: n - 1 });
-      k += n;
-    });
-    return { tab: tab, stock: cards.slice(k) };
-  }
-
-  /* ---------- בדיקת פתירוּת ---------- */
-  /* כל קלף בחפיסה זמין בדפדוף, ולכן היא נשמרת כאוסף. מה שחוסם הוא הלוח:
-     קלף עליון שאין לו יעד קובר את כל מה שתחתיו. */
-
-  function trialState(d) {
-    return {
-      tab: d.tab.map(function (p) {
-        return p.cards.map(function (c) { return { t: c.type, c: c.cat }; });
-      }),
-      stock: d.stock.map(function (c) { return { t: c.type, c: c.cat }; }),
-      found: [null, null, null, null]
-    };
-  }
-
-  function trialWon(s) {
-    return s.stock.length === 0 &&
-      s.found.every(function (f) { return f === null; }) &&
-      s.tab.every(function (p) { return p.length === 0; });
-  }
-
-  function slotFor(s, card) {
-    for (var i = 0; i < SLOTS; i++) if (s.found[i] && s.found[i].cat === card.c) return i;
-    return -1;
-  }
-
-  function toFoundation(s, card, slot) {
-    if (card.t === 'cat') { s.found[slot] = { cat: card.c, n: 0 }; return; }
-    var f = s.found[slot];
-    f.n++;
-    if (f.n === size(f.cat)) s.found[slot] = null;
-  }
-
-  function playout(s, rnd) {
-    for (var step = 0; step < 3000; step++) {
-      if (trialWon(s)) return true;
-
-      // 1. מילה שקטגוריה שלה כבר פתוחה — תמיד כדאי, מהלוח ומהחפיסה כאחד
-      var acted = false;
-      for (var i = 0; i < s.tab.length && !acted; i++) {
-        var p = s.tab[i];
-        if (!p.length) continue;
-        var c = p[p.length - 1];
-        if (c.t !== 'word') continue;
-        var sl = slotFor(s, c);
-        if (sl >= 0) { p.pop(); toFoundation(s, c, sl); acted = true; }
-      }
-      if (acted) continue;
-      for (var j = 0; j < s.stock.length; j++) {
-        var sc = s.stock[j];
-        if (sc.t !== 'word') continue;
-        var sl2 = slotFor(s, sc);
-        if (sl2 >= 0) { s.stock.splice(j, 1); toFoundation(s, sc, sl2); acted = true; break; }
-      }
-      if (acted) continue;
-
-      // 2. פתיחת קטגוריה במקום פנוי
-      var empty = s.found.indexOf(null);
-      if (empty >= 0) {
-        var cands = [];
-        for (var a = 0; a < s.tab.length; a++) {
-          var q = s.tab[a];
-          if (q.length && q[q.length - 1].t === 'cat') cands.push({ k: 't', i: a });
-        }
-        for (var b = 0; b < s.stock.length; b++) {
-          if (s.stock[b].t === 'cat') cands.push({ k: 's', i: b });
-        }
-        if (cands.length) {
-          var pick = cands[Math.floor(rnd() * cands.length)];
-          var card = pick.k === 't' ? s.tab[pick.i].pop() : s.stock.splice(pick.i, 1)[0];
-          toFoundation(s, card, empty);
-          continue;
-        }
-      }
-
-      // 3. העברה בתוך הלוח, כדי לחשוף את מה שמתחת
-      var moves = [];
-      for (var x = 0; x < s.tab.length; x++) {
-        var px = s.tab[x];
-        if (!px.length) continue;
-        var cx = px[px.length - 1];
-        if (cx.t !== 'word') continue;
-        for (var y = 0; y < s.tab.length; y++) {
-          if (y === x || !s.tab[y].length) continue;
-          if (s.tab[y][s.tab[y].length - 1].c === cx.c) moves.push([x, y]);
-        }
-      }
-      if (moves.length) {
-        var m = moves[Math.floor(rnd() * moves.length)];
-        s.tab[m[1]].push(s.tab[m[0]].pop());
-        continue;
-      }
-
-      return false;
-    }
-    return false;
-  }
-
-  function findSeed(startSeed) {
-    var rnd = rngFrom(startSeed ^ 0x9e3779b9);
-    for (var tries = 0; tries < 200; tries++) {
-      var seed = (startSeed + tries * 2654435761) >>> 0;
-      var d = deal(seed);
-      for (var k = 0; k < 140; k++) {
-        if (playout(trialState(d), rnd)) return seed;
-      }
-    }
-    return startSeed;
+  function screenedSeed() {
+    return D.findSeed(DECK, sizeOf, (Math.random() * 0xffffffff) >>> 0).seed;
   }
 
   /* ---------- מצב המשחק ---------- */
 
   var state = null;
   var history = [];
-  var selected = null;          // { kind:'tab'|'stock', index }
+  var selected = null;
   var timerId = null;
 
   function newState(seed) {
-    var d = deal(seed);
+    var d = D.deal(DECK, seed);
     return {
       seed: seed,
       tab: d.tab,
-      stock: d.stock,               // הפוכים, הקלף האחרון הוא העליון
-      waste: [],                    // גלויים, זמין רק העליון
+      stock: d.stock,
+      waste: [],
       found: [null, null, null, null],
       moves: 0,
       errors: 0,
-      active: false,        // השעון התחיל לרוץ
-      since: 0,             // תחילת המקטע הנוכחי, או אפס כשהוא מושהה
+      active: false,
+      since: 0,
       elapsed: 0,
       won: false
     };
@@ -225,9 +102,7 @@
 
   /* ---------- חוקי המשחק ---------- */
 
-  function wasteCard() {
-    return state.waste[state.waste.length - 1] || null;
-  }
+  function wasteCard() { return state.waste[state.waste.length - 1] || null; }
 
   /* רצף הקלפים הגלויים בערמה הוא תמיד מקטגוריה אחת, שהרי כל קלף שהונח
      הונח על קלף מאותה קטגוריה. לכן אפשר להרים כל קלף גלוי יחד עם מה שמעליו. */
@@ -243,7 +118,7 @@
 
   function legalGroup(group, dest) {
     if (!group.length) return false;
-    if (dest.kind === 'stock' || dest.kind === 'waste') return false;   // בחפיסה ובגלויים אין מניחים קלפים
+    if (dest.kind === 'stock' || dest.kind === 'waste') return false;
 
     if (dest.kind === 'tab') {
       var pile = state.tab[dest.index].cards;
@@ -264,7 +139,7 @@
     }
     for (; i < group.length; i++) {
       if (group[i].type !== 'word' || group[i].cat !== cat) return false;
-      if (++placed > size(cat)) return false;
+      if (++placed > sizeOf(cat)) return false;
     }
     return true;
   }
@@ -281,7 +156,7 @@
     var f = state.found[slot];
     if (!f) { state.found[slot] = { cat: card.cat, cards: [card] }; return; }
     f.cards.push(card);
-    if (f.cards.length === size(f.cat) + 1) state.found[slot] = null;
+    if (f.cards.length === sizeOf(f.cat) + 1) state.found[slot] = null;
   }
 
   function attempt(src, dest) {
@@ -302,7 +177,6 @@
 
     history.push(snapshot());
     var moving = takeGroup(src, group.length);
-
     if (dest.kind === 'found') {
       moving.forEach(function (c) { putOnFoundation(dest.index, c); });
     } else {
@@ -322,12 +196,8 @@
     if (state.won) return;
     if (!state.stock.length && !state.waste.length) return;
     history.push(snapshot());
-    if (state.stock.length) {
-      state.waste.push(state.stock.pop());
-    } else {
-      state.stock = state.waste.reverse();
-      state.waste = [];
-    }
+    if (state.stock.length) state.waste.push(state.stock.pop());
+    else { state.stock = state.waste.reverse(); state.waste = []; }
     state.moves++;
     startClock();
     selected = null;
@@ -349,8 +219,8 @@
   /* הזמן נצבר במקטעים. מקטע נפתח כשהחלון בפוקוס ונסגר כשהוא יוצא ממנו. */
 
   function elapsedNow() {
-    var extra = state.since ? (Date.now() - state.since) / 1000 : 0;
-    return Math.floor(state.elapsed + extra);
+    if (!state) return 0;
+    return Math.floor(state.elapsed + (state.since ? (Date.now() - state.since) / 1000 : 0));
   }
 
   function tick() { paintStats(); }
@@ -393,8 +263,10 @@
     if (document.hidden) pauseClock(); else resumeClock();
   });
 
-  /* ---------- תצוגה ---------- */
+  /* ---------- אלמנטים ---------- */
 
+  var elMenu = document.getElementById('menu');
+  var elGame = document.getElementById('game');
   var elFound = document.getElementById('foundations');
   var elStock = document.getElementById('stock');
   var elWaste = document.getElementById('waste');
@@ -403,7 +275,58 @@
   var elTime = document.getElementById('stat-time');
   var elErrors = document.getElementById('stat-errors');
   var elWin = document.getElementById('win');
-  var board = document.querySelector('.board');
+  var board = elGame;
+
+  function text(id, value) { document.getElementById(id).textContent = value; }
+
+  /* ---------- חיווי על מהלך שאינו חוקי ---------- */
+
+  var soundOn = true;
+  try { soundOn = localStorage.getItem('wordsol-sound') !== 'off'; } catch (e) { /* ברירת המחדל */ }
+  var audio = null;
+
+  function buzz() {
+    if (!soundOn) return;
+    try {
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      if (!audio) audio = new Ctx();
+      if (audio.state === 'suspended') audio.resume();
+      var t = audio.currentTime;
+      var osc = audio.createOscillator();
+      var gain = audio.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(160, t);
+      osc.frequency.exponentialRampToValueAtTime(70, t + 0.16);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.07, t + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+      osc.connect(gain);
+      gain.connect(audio.destination);
+      osc.start(t);
+      osc.stop(t + 0.2);
+    } catch (e) { /* בלי צליל */ }
+  }
+
+  function shake() {
+    board.classList.remove('is-shaking');
+    void board.offsetWidth;
+    board.classList.add('is-shaking');
+    setTimeout(function () { board.classList.remove('is-shaking'); }, 380);
+  }
+
+  function flash(dest) {
+    var node = document.querySelector('[data-kind="' + dest.kind + '"][data-index="' + dest.index + '"]');
+    if (!node) return;
+    node.classList.remove('is-wrong');
+    void node.offsetWidth;
+    node.classList.add('is-wrong');
+    setTimeout(function () { node.classList.remove('is-wrong'); }, 420);
+  }
+
+  function reject(dest) { flash(dest); buzz(); shake(); }
+
+  /* ---------- תצוגת הלוח ---------- */
 
   function cardEl(card, faceUp, draggable) {
     var d = document.createElement('div');
@@ -418,7 +341,7 @@
     if (card.type === 'cat') {
       var n = document.createElement('span');
       n.className = 'card-count';
-      n.textContent = size(card.cat);
+      n.textContent = sizeOf(card.cat);
       head.appendChild(n);
     }
     d.appendChild(head);
@@ -445,10 +368,8 @@
       head.className = 'slot-head';
       if (f) {
         head.innerHTML = '<span class="slot-name"></span><span class="slot-progress"></span>';
-        head.firstChild.textContent = CATEGORIES[f.cat].name;
-        head.lastChild.textContent = (f.cards.length - 1) + ' / ' + size(f.cat);
-      } else {
-        head.innerHTML = '';
+        head.firstChild.textContent = SET[f.cat].name;
+        head.lastChild.textContent = (f.cards.length - 1) + ' / ' + sizeOf(f.cat);
       }
 
       var pile = document.createElement('div');
@@ -458,7 +379,7 @@
       } else {
         var ph = document.createElement('div');
         ph.className = 'ghost';
-        ph.textContent = 'קלף קטגוריה';
+        ph.textContent = T.catGhost;
         pile.appendChild(ph);
       }
 
@@ -489,13 +410,11 @@
       var back = cardEl(null, false, false);
       if (n > 1) back.classList.add('card--deck');
       pile.appendChild(back);
-      slot.setAttribute('aria-label', 'חשיפת קלף מהחפיסה');
     } else {
       var ph = document.createElement('div');
       ph.className = 'ghost' + (state.waste.length ? '' : ' ghost--done');
-      ph.textContent = state.waste.length ? 'סיבוב נוסף' : 'ריקה';
+      ph.textContent = state.waste.length ? T.again : T.empty;
       pile.appendChild(ph);
-      slot.setAttribute('aria-label', state.waste.length ? 'התחלת סיבוב נוסף בחפיסה' : 'החפיסה ריקה');
     }
 
     slot.appendChild(head);
@@ -583,57 +502,6 @@
     document.getElementById('btn-undo').disabled = history.length === 0 || state.won;
   }
 
-  /* ---------- חיווי על מהלך שאינו חוקי ---------- */
-
-  var soundOn = true;
-  try { soundOn = localStorage.getItem('wordsol-sound') !== 'off'; } catch (e) { /* ברירת המחדל */ }
-  var audio = null;
-
-  function buzz() {
-    if (!soundOn) return;
-    try {
-      var Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return;
-      if (!audio) audio = new Ctx();
-      if (audio.state === 'suspended') audio.resume();
-      var t = audio.currentTime;
-      var osc = audio.createOscillator();
-      var gain = audio.createGain();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(160, t);
-      osc.frequency.exponentialRampToValueAtTime(70, t + 0.16);
-      gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.exponentialRampToValueAtTime(0.07, t + 0.012);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
-      osc.connect(gain);
-      gain.connect(audio.destination);
-      osc.start(t);
-      osc.stop(t + 0.2);
-    } catch (e) { /* בלי צליל */ }
-  }
-
-  function shake() {
-    board.classList.remove('is-shaking');
-    void board.offsetWidth;
-    board.classList.add('is-shaking');
-    setTimeout(function () { board.classList.remove('is-shaking'); }, 380);
-  }
-
-  function reject(dest) {
-    flash(dest);
-    buzz();
-    shake();
-  }
-
-  function flash(dest) {
-    var node = document.querySelector('[data-kind="' + dest.kind + '"][data-index="' + dest.index + '"]');
-    if (!node) return;
-    node.classList.remove('is-wrong');
-    void node.offsetWidth;
-    node.classList.add('is-wrong');
-    setTimeout(function () { node.classList.remove('is-wrong'); }, 420);
-  }
-
   /* ---------- גרירה והקשה ---------- */
 
   var grip = null;
@@ -651,10 +519,10 @@
   }
 
   board.addEventListener('pointerdown', function (ev) {
-    if (state.won || (ev.button && ev.button !== 0)) return;
+    if (!state || state.won || (ev.button && ev.button !== 0)) return;
     if (ev.target.closest('button') || ev.target.closest('.rules')) return;
     var host = hostOf(ev.target);
-    grip = { host: host, x0: ev.clientX, y0: ev.clientY, moved: false, ghost: null, el: null };
+    grip = { host: host, x0: ev.clientX, y0: ev.clientY, moved: false, ghost: null, el: null, idx: null };
     if (!host) return;
     var node = ev.target.closest('.card[data-drag]');
     if (node) {
@@ -727,41 +595,142 @@
   });
 
   document.addEventListener('keydown', function (ev) {
-    if (ev.key === 'Escape') { selected = null; render(); return; }
+    if (ev.key === 'Escape') { selected = null; if (state) render(); return; }
     if (ev.key !== 'Enter' && ev.key !== ' ') return;
-    var slot = document.activeElement;
-    if (slot && slot.dataset && slot.dataset.kind === 'stock') { ev.preventDefault(); drawFromStock(); }
+    var node = document.activeElement;
+    if (node && node.dataset && node.dataset.kind === 'stock') { ev.preventDefault(); drawFromStock(); }
   });
 
-  /* ---------- כפתורים ---------- */
+  /* ---------- מעבר בין תפריט ללוח ---------- */
 
-  function start(seed) {
+  function fillRules(wrap) {
+    wrap.querySelector('summary').textContent = T.rulesTitle;
+    var ul = wrap.querySelector('ul');
+    ul.innerHTML = '';
+    T.rules.forEach(function (line) {
+      var li = document.createElement('li');
+      li.textContent = line;
+      ul.appendChild(li);
+    });
+  }
+
+  function optionButton(group, key, label, onPick) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'option' + (choice[group] === key ? ' is-on' : '');
+    b.setAttribute('aria-pressed', choice[group] === key ? 'true' : 'false');
+    b.textContent = label;
+    b.addEventListener('click', function () { onPick(key); });
+    return b;
+  }
+
+  function renderMenu() {
+    document.documentElement.setAttribute('dir', T.dir);
+    document.documentElement.setAttribute('lang', T.lang);
+
+    text('menu-title', T.title);
+    text('menu-lead', T.lead);
+    text('lang-label', T.langLabel);
+    text('level-label', T.levelLabel);
+    text('btn-start', T.start);
+
+    var langs = document.getElementById('opt-lang');
+    langs.innerHTML = '';
+    Object.keys(TEXT).forEach(function (key) {
+      langs.appendChild(optionButton('lang', key, TEXT[key].name, function (k) {
+        choice.lang = k;
+        T = TEXT[k];
+        rememberChoice();
+        renderMenu();
+      }));
+    });
+
+    var levels = document.getElementById('opt-level');
+    levels.innerHTML = '';
+    ['easy', 'medium', 'hard'].forEach(function (key) {
+      levels.appendChild(optionButton('level', key, T.levels[key], function (k) {
+        choice.level = k;
+        rememberChoice();
+        renderMenu();
+      }));
+    });
+
+    text('level-hint', T.levelHint[choice.level] + ' · ' +
+      T.bankSize(BANKS[choice.lang][choice.level].length));
+
+    fillRules(document.getElementById('menu-rules'));
+  }
+
+  function paintGameChrome() {
+    document.documentElement.setAttribute('dir', T.dir);
+    document.documentElement.setAttribute('lang', T.lang);
+    text('game-title', T.title);
+    text('lbl-moves', T.moves);
+    text('lbl-time', T.time);
+    text('lbl-errors', T.errors);
+    text('wlbl-moves', T.moves);
+    text('wlbl-time', T.time);
+    text('wlbl-errors', T.errors);
+    text('btn-undo', T.undo);
+    text('btn-same-deal', T.sameDeal);
+    text('btn-same-words', T.sameWords);
+    text('btn-new-set', T.newSet);
+    text('btn-menu', T.toMenu);
+    text('btn-win-words', T.sameWords);
+    text('btn-win-set', T.newSet);
+    text('btn-win-menu', T.toMenu);
+    text('win-title', T.winTitle);
+    paintSound();
+    fillRules(document.getElementById('game-rules'));
+  }
+
+  function showMenu() {
+    stopClock();
+    selected = null;
+    elWin.hidden = true;
+    elGame.hidden = true;
+    elMenu.hidden = false;
+    renderMenu();
+  }
+
+  function begin(seed) {
     stopClock();
     state = newState(seed);
     history = [];
     selected = null;
     elWin.hidden = true;
+    elMenu.hidden = true;
+    elGame.hidden = false;
+    paintGameChrome();
     render();
   }
 
-  function freshDeal() { start(findSeed((Math.random() * 0xffffffff) >>> 0)); }
+  function startFreshSet() { drawNewSet(); begin(screenedSeed()); }
+
+  /* ---------- כפתורים ---------- */
 
   var btnSound = document.getElementById('btn-sound');
+
   function paintSound() {
-    btnSound.textContent = soundOn ? 'צליל פועל' : 'צליל כבוי';
+    btnSound.textContent = soundOn ? T.soundOn : T.soundOff;
     btnSound.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
   }
+
   btnSound.addEventListener('click', function () {
     soundOn = !soundOn;
     try { localStorage.setItem('wordsol-sound', soundOn ? 'on' : 'off'); } catch (e) { /* לא נורא */ }
     paintSound();
     if (soundOn) buzz();
   });
-  paintSound();
 
-  document.getElementById('btn-new').addEventListener('click', freshDeal);
-  document.getElementById('btn-again').addEventListener('click', freshDeal);
-  document.getElementById('btn-restart').addEventListener('click', function () { start(state.seed); });
+  document.getElementById('btn-start').addEventListener('click', startFreshSet);
+  document.getElementById('btn-new-set').addEventListener('click', startFreshSet);
+  document.getElementById('btn-win-set').addEventListener('click', startFreshSet);
+  document.getElementById('btn-same-deal').addEventListener('click', function () { begin(state.seed); });
+  document.getElementById('btn-same-words').addEventListener('click', function () { begin(screenedSeed()); });
+  document.getElementById('btn-win-words').addEventListener('click', function () { begin(screenedSeed()); });
+  document.getElementById('btn-menu').addEventListener('click', showMenu);
+  document.getElementById('btn-win-menu').addEventListener('click', showMenu);
 
   document.getElementById('btn-undo').addEventListener('click', function () {
     if (!history.length || state.won) return;
@@ -772,6 +741,7 @@
   });
 
   function showWin() {
+    text('win-text', T.winText(SET.length));
     document.getElementById('win-moves').textContent = state.moves;
     document.getElementById('win-time').textContent = clockText(elapsedNow());
     document.getElementById('win-errors').textContent = state.errors;
@@ -781,27 +751,41 @@
   /* ---------- הפעלה ---------- */
 
   function boot(saved) {
-    if (saved && saved.state) {
-      state = newState(saved.state.seed);
-      restore(saved.state.snap);
-      state.errors = saved.state.errors;
-      state.elapsed = saved.state.elapsed;
-      state.won = saved.state.won;
-      history = [];
-      render();
-      if (!state.won && state.elapsed) startClock();
-      return;
+    var s = saved && saved.state;
+    if (s && s.names) {
+      var set = setFromNames(s.lang, s.level, s.names);
+      if (set) {
+        choice = { lang: s.lang, level: s.level };
+        T = TEXT[s.lang];
+        SET = set;
+        DECK = D.buildDeck(set);
+        state = newState(s.seed);
+        restore(s.snap);
+        state.errors = s.errors;
+        state.elapsed = s.elapsed;
+        state.won = s.won;
+        history = [];
+        elMenu.hidden = true;
+        elGame.hidden = false;
+        paintGameChrome();
+        render();
+        if (s.won) showWin(); else if (s.elapsed) startClock();
+        return;
+      }
     }
-    freshDeal();
+    showMenu();
   }
 
   var hot = window.claude && window.claude.hot;
   if (hot && hot.snapshot) {
     hot.snapshot(function () {
+      if (!state || elGame.hidden) return {};
       return {
         state: {
-          seed: state.seed, snap: snapshot(), errors: state.errors,
-          elapsed: elapsedNow(), won: state.won
+          lang: choice.lang, level: choice.level,
+          names: SET.map(function (c) { return c.name; }),
+          seed: state.seed, snap: snapshot(),
+          errors: state.errors, elapsed: elapsedNow(), won: state.won
         }
       };
     });
