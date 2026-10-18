@@ -1,10 +1,13 @@
 /* פריסה: לוח במסך אחד — הקטגוריות הפתוחות, החפיסה והגלויים למעלה, ערמות הקלפים מתחתיה.
-   הלוח מחויב למראה אחד, שולחן בהיר וקלפים בגוון נייר, בלי תלות בערכת המכשיר:
-   קלף הוא חפץ בהיר, וכהה שולחן עושה אותו מסנוור.
-   ההכרזה 'רק בהיר' היא זו שאומרת לדפדפן לא להחיל על הדף הכהיה אוטומטית
-   משלו. הכרזה על תמיכה בשתי הסכמות נוסתה קודם ולא עצרה את ההכהיה. */
+   הלוח מחויב למראה אחד, שולחן בהיר וקלפים בגוון נייר: קלף הוא חפץ בהיר,
+   ושולחן כהה עושה אותו מסנוור.
+
+   ובכל זאת יש כאן גוש לסכמה הכהה, והוא חוזר על אותם הערכים הבהירים בדיוק.
+   זו אינה כפילות מיותרת: דפדפן שמכהה אתרים בעצמו מדלג על דף שמצהיר
+   שהוא מטפל בכהה, והצהרה כזו היא בדיוק גוש כזה לצד ההכרזה על שתי הסכמות.
+   בלעדיו הדף נחשב בהיר בלבד, והדפדפן משחיר את רקעיו. */
 :root {
-  color-scheme: only light;
+  color-scheme: light dark;
   --felt: #d8c7c4;
   --felt-edge: #c2aba7;
   --panel: #eee0dd;
@@ -33,6 +36,49 @@
   --fs-count: calc(var(--cw) * 0.145);
 
   background: var(--felt);
+}
+
+@media (prefers-color-scheme: dark) {
+  /* אותם ערכים בהירים: הלוח נשאר בהיר גם כשהמכשיר כהה */
+  :root:not([data-theme="light"]) {
+    --felt: #d8c7c4;
+    --felt-edge: #c2aba7;
+    --panel: #eee0dd;
+    --ink: #241715;
+    --muted: #6d5552;
+    --paper: #fdfaf7;
+    --paper-ink: #231a18;
+    --paper-edge: #ddd0ca;
+    --cat: #8a2b23;
+    --cat-ink: #fbeeeb;
+    --cat-edge: #671c16;
+    --back: #b6827c;
+    --back-line: #a26e68;
+    --back-edge: #7d4942;
+    --ghost-edge: #bfa5a1;
+    --accent: #9c6a16;
+    --danger: #c23d26;
+  }
+}
+
+:root[data-theme="dark"] {
+  --felt: #d8c7c4;
+  --felt-edge: #c2aba7;
+  --panel: #eee0dd;
+  --ink: #241715;
+  --muted: #6d5552;
+  --paper: #fdfaf7;
+  --paper-ink: #231a18;
+  --paper-edge: #ddd0ca;
+  --cat: #8a2b23;
+  --cat-ink: #fbeeeb;
+  --cat-edge: #671c16;
+  --back: #b6827c;
+  --back-line: #a26e68;
+  --back-edge: #7d4942;
+  --ghost-edge: #bfa5a1;
+  --accent: #9c6a16;
+  --danger: #c23d26;
 }
 
 * { box-sizing: border-box; }
