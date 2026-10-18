@@ -1,5 +1,10 @@
-/* פריסה: לוח במסך אחד — הקטגוריות הפתוחות, החפיסה והגלויים למעלה, ערמות הקלפים מתחתיה */
+/* פריסה: לוח במסך אחד — הקטגוריות הפתוחות, החפיסה והגלויים למעלה, ערמות הקלפים מתחתיה.
+   הלוח מחויב למראה אחד, שולחן בהיר וקלפים בגוון נייר, בלי תלות בערכת המכשיר:
+   קלף הוא חפץ בהיר, וכהה שולחן עושה אותו מסנוור.
+   ההכרזה על שתי הסכמות אומרת לדפדפן שהדף מטפל בעצמו בכהה, וכך הוא אינו
+   כופה עליו הכהיה אוטומטית ומשחיר את הרקעים. */
 :root {
+  color-scheme: light dark;
   --felt: #d8c7c4;
   --felt-edge: #c2aba7;
   --panel: #eee0dd;
@@ -26,50 +31,8 @@
   --fan-up: calc(var(--ch) * 0.34);
   --fs-card: calc(var(--cw) * 0.165);
   --fs-count: calc(var(--cw) * 0.145);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --felt: #3a2926;
-    --felt-edge: #2a1d1b;
-    --panel: #4a3531;
-    --ink: #f6eeea;
-    --muted: #c4aaa4;
-    --paper: #f4ece4;
-    --paper-ink: #241b18;
-    --paper-edge: #cabdb2;
-    --cat: #b2463a;
-    --cat-ink: #fdf3f0;
-    --cat-edge: #8a3127;
-    --back: #85564f;
-    --back-line: #99665e;
-    --back-edge: #5c372f;
-    --ghost-edge: #6e524c;
-    --accent: #eeb268;
-    --danger: #f58a71;
-    color-scheme: dark;
-  }
-}
-
-:root[data-theme="dark"] {
-  --felt: #3a2926;
-  --felt-edge: #2a1d1b;
-  --panel: #4a3531;
-  --ink: #f6eeea;
-  --muted: #c4aaa4;
-  --paper: #f4ece4;
-  --paper-ink: #241b18;
-  --paper-edge: #cabdb2;
-  --cat: #b2463a;
-  --cat-ink: #fdf3f0;
-  --cat-edge: #8a3127;
-  --back: #85564f;
-  --back-line: #99665e;
-  --back-edge: #5c372f;
-  --ghost-edge: #6e524c;
-  --accent: #eeb268;
-  --danger: #f58a71;
-  color-scheme: dark;
+  background: var(--felt);
 }
 
 * { box-sizing: border-box; }
