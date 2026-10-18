@@ -63,10 +63,15 @@
 
   <div class="controls">
     <button type="button" id="btn-undo"></button>
-    <button type="button" id="btn-same-deal"></button>
-    <button type="button" id="btn-same-words"></button>
-    <button type="button" id="btn-new-set"></button>
-    <button type="button" id="btn-menu"></button>
+    <span class="dropdown">
+      <button type="button" id="btn-more" aria-haspopup="true" aria-expanded="false"></button>
+      <div class="pop" id="more-pop" hidden>
+        <button type="button" id="btn-same-deal"></button>
+        <button type="button" id="btn-same-words"></button>
+        <button type="button" id="btn-new-set"></button>
+        <button type="button" id="btn-menu"></button>
+      </div>
+    </span>
     <button type="button" id="btn-sound" class="btn-toggle" aria-pressed="true"></button>
   </div>
 

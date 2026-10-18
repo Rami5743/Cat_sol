@@ -9,6 +9,7 @@
 
   /* ---------- בחירה בתפריט ---------- */
 
+  var LEVEL_ORDER = ['easy', 'medium', 'hard', 'extreme'];
   var choice = { lang: 'he', level: 'easy' };
   try {
     var saved = JSON.parse(localStorage.getItem('wordsol-choice') || 'null');
@@ -595,7 +596,7 @@
   });
 
   document.addEventListener('keydown', function (ev) {
-    if (ev.key === 'Escape') { selected = null; if (state) render(); return; }
+    if (ev.key === 'Escape') { closePop(); selected = null; if (state) render(); return; }
     if (ev.key !== 'Enter' && ev.key !== ' ') return;
     var node = document.activeElement;
     if (node && node.dataset && node.dataset.kind === 'stock') { ev.preventDefault(); drawFromStock(); }
@@ -645,9 +646,16 @@
       }));
     });
 
+    /* רמה קיימת רק אם יש לה בנק בשפה הנבחרת */
+    var available = LEVEL_ORDER.filter(function (k) { return BANKS[choice.lang][k]; });
+    if (available.indexOf(choice.level) < 0) {
+      choice.level = available[available.length - 1];
+      rememberChoice();
+    }
+
     var levels = document.getElementById('opt-level');
     levels.innerHTML = '';
-    ['easy', 'medium', 'hard'].forEach(function (key) {
+    available.forEach(function (key) {
       levels.appendChild(optionButton('level', key, T.levels[key], function (k) {
         choice.level = k;
         rememberChoice();
@@ -676,6 +684,7 @@
     text('btn-same-words', T.sameWords);
     text('btn-new-set', T.newSet);
     text('btn-menu', T.toMenu);
+    document.getElementById('btn-more').textContent = T.options + ' \u25be';
     text('btn-win-words', T.sameWords);
     text('btn-win-set', T.newSet);
     text('btn-win-menu', T.toMenu);
@@ -685,6 +694,7 @@
   }
 
   function showMenu() {
+    closePop();
     stopClock();
     selected = null;
     elWin.hidden = true;
@@ -694,6 +704,7 @@
   }
 
   function begin(seed) {
+    closePop();
     stopClock();
     state = newState(seed);
     history = [];
@@ -721,6 +732,25 @@
     try { localStorage.setItem('wordsol-sound', soundOn ? 'on' : 'off'); } catch (e) { /* לא נורא */ }
     paintSound();
     if (soundOn) buzz();
+  });
+
+  var pop = document.getElementById('more-pop');
+  var btnMore = document.getElementById('btn-more');
+
+  function closePop() {
+    pop.hidden = true;
+    btnMore.setAttribute('aria-expanded', 'false');
+  }
+
+  btnMore.addEventListener('click', function (ev) {
+    ev.stopPropagation();
+    pop.hidden = !pop.hidden;
+    btnMore.setAttribute('aria-expanded', pop.hidden ? 'false' : 'true');
+  });
+
+  pop.addEventListener('click', closePop);
+  document.addEventListener('click', function (ev) {
+    if (!pop.hidden && !ev.target.closest('.dropdown')) closePop();
   });
 
   document.getElementById('btn-start').addEventListener('click', startFreshSet);
