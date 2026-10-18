@@ -8,23 +8,23 @@
    בלעדיו הדף נחשב בהיר בלבד, והדפדפן משחיר את רקעיו. */
 :root {
   color-scheme: light dark;
-  --felt: #d8c7c4;
-  --felt-edge: #c2aba7;
-  --panel: #eee0dd;
-  --ink: #241715;
-  --muted: #6d5552;
-  --paper: #fdfaf7;
-  --paper-ink: #231a18;
-  --paper-edge: #ddd0ca;
-  --cat: #8a2b23;
-  --cat-ink: #fbeeeb;
-  --cat-edge: #671c16;
-  --back: #b6827c;
-  --back-line: #a26e68;
-  --back-edge: #7d4942;
-  --ghost-edge: #bfa5a1;
-  --accent: #9c6a16;
-  --danger: #c23d26;
+  --felt: #c7d5e3;
+  --felt-edge: #a8bbd1;
+  --panel: #e3ebf4;
+  --ink: #13202c;
+  --muted: #4f6373;
+  --paper: #fbfcfe;
+  --paper-ink: #141e29;
+  --paper-edge: #ccd6e2;
+  --cat: #1f4d80;
+  --cat-ink: #eef4fb;
+  --cat-edge: #163a61;
+  --back: #7f9ec3;
+  --back-line: #6b8cb3;
+  --back-edge: #4a6b92;
+  --ghost-edge: #9eb2c8;
+  --accent: #b5731a;
+  --danger: #c0392b;
   --font-display: 'Frank Ruhl Libre', Georgia, 'Times New Roman', serif;
   --font-body: 'Heebo', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
@@ -41,44 +41,44 @@
 @media (prefers-color-scheme: dark) {
   /* אותם ערכים בהירים: הלוח נשאר בהיר גם כשהמכשיר כהה */
   :root:not([data-theme="light"]) {
-    --felt: #d8c7c4;
-    --felt-edge: #c2aba7;
-    --panel: #eee0dd;
-    --ink: #241715;
-    --muted: #6d5552;
-    --paper: #fdfaf7;
-    --paper-ink: #231a18;
-    --paper-edge: #ddd0ca;
-    --cat: #8a2b23;
-    --cat-ink: #fbeeeb;
-    --cat-edge: #671c16;
-    --back: #b6827c;
-    --back-line: #a26e68;
-    --back-edge: #7d4942;
-    --ghost-edge: #bfa5a1;
-    --accent: #9c6a16;
-    --danger: #c23d26;
+    --felt: #c7d5e3;
+    --felt-edge: #a8bbd1;
+    --panel: #e3ebf4;
+    --ink: #13202c;
+    --muted: #4f6373;
+    --paper: #fbfcfe;
+    --paper-ink: #141e29;
+    --paper-edge: #ccd6e2;
+    --cat: #1f4d80;
+    --cat-ink: #eef4fb;
+    --cat-edge: #163a61;
+    --back: #7f9ec3;
+    --back-line: #6b8cb3;
+    --back-edge: #4a6b92;
+    --ghost-edge: #9eb2c8;
+    --accent: #b5731a;
+    --danger: #c0392b;
   }
 }
 
 :root[data-theme="dark"] {
-  --felt: #d8c7c4;
-  --felt-edge: #c2aba7;
-  --panel: #eee0dd;
-  --ink: #241715;
-  --muted: #6d5552;
-  --paper: #fdfaf7;
-  --paper-ink: #231a18;
-  --paper-edge: #ddd0ca;
-  --cat: #8a2b23;
-  --cat-ink: #fbeeeb;
-  --cat-edge: #671c16;
-  --back: #b6827c;
-  --back-line: #a26e68;
-  --back-edge: #7d4942;
-  --ghost-edge: #bfa5a1;
-  --accent: #9c6a16;
-  --danger: #c23d26;
+  --felt: #c7d5e3;
+  --felt-edge: #a8bbd1;
+  --panel: #e3ebf4;
+  --ink: #13202c;
+  --muted: #4f6373;
+  --paper: #fbfcfe;
+  --paper-ink: #141e29;
+  --paper-edge: #ccd6e2;
+  --cat: #1f4d80;
+  --cat-ink: #eef4fb;
+  --cat-edge: #163a61;
+  --back: #7f9ec3;
+  --back-line: #6b8cb3;
+  --back-edge: #4a6b92;
+  --ghost-edge: #9eb2c8;
+  --accent: #b5731a;
+  --danger: #c0392b;
 }
 
 * { box-sizing: border-box; }
