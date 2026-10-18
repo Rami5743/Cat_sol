@@ -1,21 +1,22 @@
-/* פריסה: לוח במסך אחד — רצועת הקטגוריות הפתוחות וערמת ההמתנה למעלה, ערמות הקלפים מתחתיה */
+/* פריסה: לוח במסך אחד — הקטגוריות הפתוחות, החפיסה והגלויים למעלה, ערמות הקלפים מתחתיה */
 :root {
-  --felt: #ccd6d1;
-  --felt-edge: #b4c1bb;
-  --panel: #e3eae6;
-  --ink: #16211f;
-  --muted: #5b6b67;
-  --paper: #fcfaf5;
-  --paper-ink: #1a2321;
-  --paper-edge: #d6d1c3;
-  --cat: #0f4b46;
-  --cat-ink: #eff5f2;
-  --cat-edge: #0a3734;
-  --back: #7d9b95;
-  --back-line: #6a8882;
-  --back-edge: #4f6d67;
-  --accent: #c07226;
-  --danger: #a33d2c;
+  --felt: #d8c7c4;
+  --felt-edge: #c2aba7;
+  --panel: #eee0dd;
+  --ink: #241715;
+  --muted: #6d5552;
+  --paper: #fdfaf7;
+  --paper-ink: #231a18;
+  --paper-edge: #ddd0ca;
+  --cat: #8a2b23;
+  --cat-ink: #fbeeeb;
+  --cat-edge: #671c16;
+  --back: #b6827c;
+  --back-line: #a26e68;
+  --back-edge: #7d4942;
+  --ghost-edge: #bfa5a1;
+  --accent: #9c6a16;
+  --danger: #c23d26;
   --font-display: 'Frank Ruhl Libre', Georgia, 'Times New Roman', serif;
   --font-body: 'Heebo', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
@@ -29,43 +30,45 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --felt: #111b1a;
-    --felt-edge: #0a1313;
-    --panel: #182425;
-    --ink: #e6ece9;
-    --muted: #8ba09b;
-    --paper: #ddd9ce;
-    --paper-ink: #19211f;
-    --paper-edge: #b6b1a2;
-    --cat: #1d6a63;
-    --cat-ink: #f1f7f4;
-    --cat-edge: #12504a;
-    --back: #31504c;
-    --back-line: #40615c;
-    --back-edge: #1b302d;
-    --accent: #dfa25c;
-    --danger: #d2705c;
+    --felt: #1b1211;
+    --felt-edge: #120b0a;
+    --panel: #271b19;
+    --ink: #ece1de;
+    --muted: #a28b87;
+    --paper: #e0d8d1;
+    --paper-ink: #1d1614;
+    --paper-edge: #b9aba2;
+    --cat: #a53b2f;
+    --cat-ink: #fdf1ef;
+    --cat-edge: #7a271d;
+    --back: #4d2d29;
+    --back-line: #5f3a35;
+    --back-edge: #2a1614;
+    --ghost-edge: #45302c;
+    --accent: #e0a75c;
+    --danger: #ea7a60;
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --felt: #111b1a;
-  --felt-edge: #0a1313;
-  --panel: #182425;
-  --ink: #e6ece9;
-  --muted: #8ba09b;
-  --paper: #ddd9ce;
-  --paper-ink: #19211f;
-  --paper-edge: #b6b1a2;
-  --cat: #1d6a63;
-  --cat-ink: #f1f7f4;
-  --cat-edge: #12504a;
-  --back: #31504c;
-  --back-line: #40615c;
-  --back-edge: #1b302d;
-  --accent: #dfa25c;
-  --danger: #d2705c;
+  --felt: #1b1211;
+  --felt-edge: #120b0a;
+  --panel: #271b19;
+  --ink: #ece1de;
+  --muted: #a28b87;
+  --paper: #e0d8d1;
+  --paper-ink: #1d1614;
+  --paper-edge: #b9aba2;
+  --cat: #a53b2f;
+  --cat-ink: #fdf1ef;
+  --cat-edge: #7a271d;
+  --back: #4d2d29;
+  --back-line: #5f3a35;
+  --back-edge: #2a1614;
+  --ghost-edge: #45302c;
+  --accent: #e0a75c;
+  --danger: #ea7a60;
   color-scheme: dark;
 }
 
@@ -113,13 +116,6 @@ h1 {
   text-wrap: balance;
 }
 
-.tagline {
-  margin: 2px 0 0;
-  color: var(--muted);
-  font-size: 13px;
-  letter-spacing: 0.02em;
-}
-
 .stats {
   display: flex;
   gap: 8px;
@@ -163,15 +159,10 @@ h1 {
 
 .zone-foundations { flex: 0 1 auto; min-width: 0; }
 .zone-stock { flex: 0 0 auto; }
-.zone-tableau { min-width: 0; }
-
-.zone-title {
-  margin: 0 0 7px;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  text-transform: none;
+.zone-tableau {
+  min-width: 0;
+  border-top: 1px solid var(--felt-edge);
+  padding-top: 16px;
 }
 
 .slots {
@@ -250,7 +241,7 @@ h1 {
 .ghost {
   position: absolute;
   inset: 0;
-  border: 1px dashed var(--felt-edge);
+  border: 1px dashed var(--ghost-edge);
   border-radius: 4px;
   display: grid;
   place-items: center;

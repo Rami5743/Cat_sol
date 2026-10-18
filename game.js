@@ -190,7 +190,8 @@
       found: [null, null, null, null],
       moves: 0,
       errors: 0,
-      started: 0,
+      active: false,        // השעון התחיל לרוץ
+      since: 0,             // תחילת המקטע הנוכחי, או אפס כשהוא מושהה
       elapsed: 0,
       won: false
     };
@@ -345,27 +346,52 @@
   }
 
   /* ---------- שעון ---------- */
+  /* הזמן נצבר במקטעים. מקטע נפתח כשהחלון בפוקוס ונסגר כשהוא יוצא ממנו. */
 
-  function tick() {
-    state.elapsed = Math.floor((Date.now() - state.started) / 1000);
+  function elapsedNow() {
+    var extra = state.since ? (Date.now() - state.since) / 1000 : 0;
+    return Math.floor(state.elapsed + extra);
+  }
+
+  function tick() { paintStats(); }
+
+  function resumeClock() {
+    if (!state || !state.active || state.since || state.won) return;
+    state.since = Date.now();
+    timerId = setInterval(tick, 250);
     paintStats();
   }
 
+  function pauseClock() {
+    if (!state || !state.since) return;
+    state.elapsed += (Date.now() - state.since) / 1000;
+    state.since = 0;
+    if (timerId) { clearInterval(timerId); timerId = null; }
+    paintStats();
+  }
+
+  /* כל מהלך גם מפעיל את השעון וגם מחדש אותו, למקרה שהושהה בלי שהחלון באמת ננטש. */
   function startClock() {
-    if (state.started || state.won) return;
-    state.started = Date.now();
-    timerId = setInterval(tick, 250);
+    if (!state || state.won) return;
+    state.active = true;
+    resumeClock();
   }
 
   function stopClock() {
-    if (timerId) { clearInterval(timerId); timerId = null; }
-    if (state && state.started) state.elapsed = Math.floor((Date.now() - state.started) / 1000);
+    pauseClock();
+    if (state) state.active = false;
   }
 
   function clockText(sec) {
     var m = Math.floor(sec / 60), s = sec % 60;
     return m + ':' + (s < 10 ? '0' : '') + s;
   }
+
+  window.addEventListener('blur', pauseClock);
+  window.addEventListener('focus', resumeClock);
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) pauseClock(); else resumeClock();
+  });
 
   /* ---------- תצוגה ---------- */
 
@@ -402,7 +428,7 @@
 
   function paintStats() {
     elMoves.textContent = state.moves;
-    elTime.textContent = clockText(state.elapsed);
+    elTime.textContent = clockText(elapsedNow());
     elErrors.textContent = state.errors;
   }
 
@@ -422,7 +448,7 @@
         head.firstChild.textContent = CATEGORIES[f.cat].name;
         head.lastChild.textContent = (f.cards.length - 1) + ' / ' + size(f.cat);
       } else {
-        head.innerHTML = '<span class="slot-name slot-name--idle">מקום פנוי</span>';
+        head.innerHTML = '';
       }
 
       var pile = document.createElement('div');
@@ -454,7 +480,7 @@
     var n = state.stock.length;
     var head = document.createElement('div');
     head.className = 'slot-head';
-    head.innerHTML = '<span class="slot-name slot-name--idle">החפיסה</span><span class="slot-progress"></span>';
+    head.innerHTML = '<span class="slot-progress"></span>';
     head.lastChild.textContent = n;
 
     var pile = document.createElement('div');
@@ -487,7 +513,7 @@
     var n = state.waste.length;
     var head = document.createElement('div');
     head.className = 'slot-head';
-    head.innerHTML = '<span class="slot-name slot-name--idle">גלויים</span><span class="slot-progress"></span>';
+    head.innerHTML = '<span class="slot-progress"></span>';
     head.lastChild.textContent = n;
 
     var pile = document.createElement('div');
@@ -500,7 +526,6 @@
     } else {
       var ph = document.createElement('div');
       ph.className = 'ghost ghost--done';
-      ph.textContent = 'אין';
       pile.appendChild(ph);
     }
 
@@ -522,7 +547,6 @@
         pile.style.height = 'var(--ch)';
         var ph = document.createElement('div');
         ph.className = 'ghost';
-        ph.textContent = 'פנוי לכל קלף';
         pile.appendChild(ph);
         elTab.appendChild(pile);
         return;
@@ -749,7 +773,7 @@
 
   function showWin() {
     document.getElementById('win-moves').textContent = state.moves;
-    document.getElementById('win-time').textContent = clockText(state.elapsed);
+    document.getElementById('win-time').textContent = clockText(elapsedNow());
     document.getElementById('win-errors').textContent = state.errors;
     elWin.hidden = false;
   }
@@ -765,10 +789,7 @@
       state.won = saved.state.won;
       history = [];
       render();
-      if (!state.won && state.elapsed) {
-        state.started = Date.now() - state.elapsed * 1000;
-        timerId = setInterval(tick, 250);
-      }
+      if (!state.won && state.elapsed) startClock();
       return;
     }
     freshDeal();
@@ -780,7 +801,7 @@
       return {
         state: {
           seed: state.seed, snap: snapshot(), errors: state.errors,
-          elapsed: state.elapsed, won: state.won
+          elapsed: elapsedNow(), won: state.won
         }
       };
     });
