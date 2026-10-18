@@ -24,6 +24,8 @@ body { margin: 0; background: #ffffff; color: #000000; font-family: system-ui, s
   <div class="big">אם זה לבן — ההצהרה עובדת</div>
   <div class="note">סולם אפורים. לכל שלב רשום הגוון שהוא אמור להיות.</div>
   <div class="ladder" id="ladder"></div>
+  <div class="note">צבעים בהירים ורוויים, לא אפורים. לכל אחד רשום הגוון שהוא אמור להיות.</div>
+  <div class="ladder" id="hues"></div>
   <div id="info"></div>
 </div>
 <script>
@@ -41,6 +43,20 @@ steps.forEach(function (c) {
   d.appendChild(a); d.appendChild(b);
   l.appendChild(d);
 });
+var hues = ['#fff3c4','#ffe08a','#d9f2c0','#a8e6a1','#cfe8ff','#9ecbff',
+            '#ffd6d6','#ffb0ad','#efe3c8','#d8c7c4','#e6d8f2','#c3a8e0'];
+var h = document.getElementById('hues');
+hues.forEach(function (c) {
+  var d = document.createElement('div');
+  d.className = 'step';
+  d.style.background = c;
+  d.style.color = '#000000';
+  var a = document.createElement('span'); a.textContent = c;
+  var b = document.createElement('span'); b.textContent = c;
+  d.appendChild(a); d.appendChild(b);
+  h.appendChild(d);
+});
+
 document.getElementById('info').textContent =
   'מעדיף כהה: ' + matchMedia('(prefers-color-scheme: dark)').matches +
   ' | דפדפן: ' + navigator.userAgent;
