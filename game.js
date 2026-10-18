@@ -260,6 +260,7 @@
     return m + ':' + (s < 10 ? '0' : '') + s;
   }
 
+  window.addEventListener('resize', function () { hideBubble(); });
   window.addEventListener('blur', pauseClock);
   window.addEventListener('focus', resumeClock);
   document.addEventListener('visibilitychange', function () {
@@ -377,7 +378,9 @@
     var label = node.querySelector('.card-text');
     if (!label) return;
     var word = label.textContent;
-    var meaning = GLOSS[choice.lang] && GLOSS[choice.lang][word];
+    var book = GLOSS[choice.lang];
+    /* ההסברים נשמרים לפי הכתיב בלי ניקוד, כדי שניקוד על הקלף לא ינתק אותם */
+    var meaning = book && book[word.replace(/[\u0591-\u05C7]/g, '')];
     if (!meaning) return;                 // קלף קטגוריה, ששמו מדבר בעד עצמו
     state.hints++;
     startClock();

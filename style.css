@@ -244,11 +244,12 @@ h1 {
 
 .stats {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .stat {
-  min-width: 72px;
+  min-width: 66px;
   padding: 6px 10px 7px;
   background: var(--panel);
   border: 1px solid var(--felt-edge);
