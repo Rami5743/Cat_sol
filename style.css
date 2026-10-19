@@ -96,14 +96,14 @@ body {
 }
 
 .board {
-  max-width: 860px;
+  max-width: 600px;
   margin-inline: auto;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 18px 32px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 
 /* ---------- התפריט ---------- */
@@ -345,7 +345,8 @@ h1 {
 .band {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px 30px;
+  justify-content: center;
+  gap: 14px 22px;
   align-items: flex-start;
 }
 
@@ -354,7 +355,7 @@ h1 {
 .zone-tableau {
   min-width: 0;
   border-top: 1px solid var(--felt-edge);
-  padding-top: 16px;
+  padding-top: 14px;
 }
 
 .slots {
@@ -426,6 +427,7 @@ h1 {
 .tableau {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 12px 10px;
   align-items: flex-start;
 }
@@ -584,6 +586,7 @@ h1 {
 .controls {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
 }
 
