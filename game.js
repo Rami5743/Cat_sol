@@ -412,10 +412,12 @@
       hintBtn.classList.add('is-lifted');
     }
     hintDrag.ghost.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+    edgeScroll(ev.clientY);
   });
 
   document.addEventListener('pointerup', function (ev) {
     if (!hintDrag) return;
+    stopEdgeScroll();
     var d = hintDrag;
     hintDrag = null;
     if (d.ghost) { d.ghost.remove(); hintBtn.classList.remove('is-lifted'); }
@@ -620,6 +622,33 @@
     document.getElementById('btn-undo').disabled = history.length === 0 || state.won;
   }
 
+
+  /* ---------- גלילה בגרירה אל מחוץ למסך ---------- */
+  /* קלף שנגרר אל שולי המסך גורר עמו את הדף, כדי להגיע ליעד שמחוץ לתצוגה. */
+
+  var scrollTimer = null;
+  var scrollStep = 0;
+
+  function edgeSpeed(y) {
+    var zone = Math.min(90, window.innerHeight * 0.18);
+    if (y < zone) return -Math.ceil((zone - y) / 6);
+    if (y > window.innerHeight - zone) return Math.ceil((y - (window.innerHeight - zone)) / 6);
+    return 0;
+  }
+
+  function edgeScroll(y) {
+    scrollStep = edgeSpeed(y);
+    if (scrollTimer) return;
+    scrollTimer = setInterval(function () {
+      if (scrollStep) window.scrollBy(0, scrollStep);
+    }, 16);
+  }
+
+  function stopEdgeScroll() {
+    if (scrollTimer) { clearInterval(scrollTimer); scrollTimer = null; }
+    scrollStep = 0;
+  }
+
   /* ---------- גרירה והקשה ---------- */
 
   var grip = null;
@@ -677,9 +706,11 @@
       grip.run = run;
     }
     grip.ghost.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+    edgeScroll(ev.clientY);
   });
 
   function endGrip(ev) {
+    stopEdgeScroll();
     if (!grip) return;
     var g = grip;
     grip = null;
@@ -705,6 +736,7 @@
 
   document.addEventListener('pointerup', endGrip);
   document.addEventListener('pointercancel', function () {
+    stopEdgeScroll();
     if (grip && grip.ghost) {
       grip.ghost.remove();
       grip.run.forEach(function (el) { el.classList.remove('is-lifted'); });
