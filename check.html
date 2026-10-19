@@ -20,7 +20,12 @@ body { margin: 0; background: #ffffff; color: #000000; font-family: system-ui, s
 </head>
 <body>
 <div class="wrap">
-  <div class="title">בדיקה שנייה · ההצהרה עכשיו ברמת הדף: רק בהיר</div>
+  <div class="title">האם הדפדפן הופך צבעים?</div>
+  <div class="note">אם שורה כהה כאן יוצאת בהירה — זה היפוך, ואז אכתוב את הלוח הפוך.
+    אם היא נשארת כהה — אין היפוך, אלא הכהיה בלבד.</div>
+  <div class="ladder" id="darks"></div>
+
+  <div class="title">ההצהרה ברמת הדף: רק בהיר</div>
   <div class="big">אם זה לבן — ההצהרה עובדת</div>
   <div class="note">סולם אפורים. לכל שלב רשום הגוון שהוא אמור להיות.</div>
   <div class="ladder" id="ladder"></div>
@@ -29,6 +34,19 @@ body { margin: 0; background: #ffffff; color: #000000; font-family: system-ui, s
   <div id="info"></div>
 </div>
 <script>
+var darks = ['#000000','#0a0a0a','#141414','#0e2338','#2a0b0b','#0b2a12'];
+var dk = document.getElementById('darks');
+darks.forEach(function (c) {
+  var d = document.createElement('div');
+  d.className = 'step';
+  d.style.background = c;
+  d.style.color = '#888888';
+  var a = document.createElement('span'); a.textContent = c;
+  var b = document.createElement('span'); b.textContent = c;
+  d.appendChild(a); d.appendChild(b);
+  dk.appendChild(d);
+});
+
 var steps = ['#ffffff','#eeeeee','#dddddd','#c8c8c8','#b0b0b0','#989898','#808080',
              '#686868','#505050','#383838','#202020','#101010'];
 var l = document.getElementById('ladder');

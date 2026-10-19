@@ -54,11 +54,10 @@
     return deck;
   }
 
-  /* סולם ערמות בגדלים שונים, רחב יותר כשהחפיסה גדולה */
+  /* ארבע ערמות בגדלים שונים, עמוקות יותר כשהחפיסה גדולה */
   function pileSizes(total) {
-    var sizes = [], n = total > 54 ? 8 : 7;
-    for (var i = 1; i <= n; i++) sizes.push(i);
-    return sizes;
+    var base = total > 54 ? 6 : 5;
+    return [base, base + 1, base + 2, base + 3];
   }
 
   function deal(deck, seed) {
