@@ -638,10 +638,10 @@
   var fitCache = {};
 
   function fitCardText() {
-    var spans = board.querySelectorAll('.card-text');
+    var spans = board.querySelectorAll('.card-text, .slot-name');
     for (var i = 0; i < spans.length; i++) {
       var el = spans[i];
-      var room = el.parentNode.clientWidth;
+      var room = el.classList.contains('slot-name') ? el.clientWidth : el.parentNode.clientWidth;
       var key = el.textContent + '|' + Math.round(room);
       var known = fitCache[key];
       if (known != null) {
