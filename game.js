@@ -260,7 +260,11 @@
     return m + ':' + (s < 10 ? '0' : '') + s;
   }
 
-  window.addEventListener('resize', function () { hideBubble(); });
+  window.addEventListener('resize', function () {
+    hideBubble();
+    fitCache = {};                 /* רוחב הקלף השתנה, המידות נמדדות מחדש */
+    if (state && !elGame.hidden) render();
+  });
   window.addEventListener('blur', pauseClock);
   window.addEventListener('focus', resumeClock);
   document.addEventListener('visibilitychange', function () {
@@ -378,10 +382,12 @@
     var label = node.querySelector('.card-text');
     if (!label) return;
     var word = label.textContent;
-    var book = GLOSS[choice.lang];
+    /* קלף קטגוריה נשאל מרשימת הקטגוריות, ומילה מרשימת המילים */
+    var book = node.classList.contains('card--cat')
+      ? GLOSS.cats[choice.lang] : GLOSS[choice.lang];
     /* ההסברים נשמרים לפי הכתיב בלי ניקוד, כדי שניקוד על הקלף לא ינתק אותם */
     var meaning = book && book[word.replace(/[\u0591-\u05C7]/g, '')];
-    if (!meaning) return;                 // קלף קטגוריה, ששמו מדבר בעד עצמו
+    if (!meaning) return;
     state.hints++;
     startClock();
     paintStats();
@@ -619,9 +625,39 @@
     renderWaste();
     renderTableau();
     paintStats();
+    fitCardText();
     document.getElementById('btn-undo').disabled = history.length === 0 || state.won;
   }
 
+
+
+  /* ---------- התאמת המילה לרוחב הקלף ---------- */
+  /* מילה אינה נשברת לשתיים: צירוף יורד שורה בין המילים, ומילה בודדת
+     שרחבה מהקלף מוקטנת עד שהיא נכנסת. המידה נשמרת לפי המילה והרוחב. */
+
+  var fitCache = {};
+
+  function fitCardText() {
+    var spans = board.querySelectorAll('.card-text');
+    for (var i = 0; i < spans.length; i++) {
+      var el = spans[i];
+      var room = el.parentNode.clientWidth;
+      var key = el.textContent + '|' + Math.round(room);
+      var known = fitCache[key];
+      if (known != null) {
+        el.style.fontSize = known < 1 ? (known * 100) + '%' : '';
+        continue;
+      }
+      el.style.fontSize = '';
+      var scale = 1;
+      while (el.scrollWidth > room + 0.5 && scale > 0.56) {
+        scale -= 0.05;
+        el.style.fontSize = (scale * 100) + '%';
+      }
+      if (scale >= 1) el.style.fontSize = '';
+      fitCache[key] = scale;
+    }
+  }
 
   /* ---------- גלילה בגרירה אל מחוץ למסך ---------- */
   /* קלף שנגרר אל שולי המסך גורר עמו את הדף, כדי להגיע ליעד שמחוץ לתצוגה. */

@@ -491,7 +491,8 @@ h1 {
   font-weight: 500;
   line-height: 1.16;
   text-align: start;
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
+  word-break: keep-all;
   min-width: 0;
 }
 
@@ -687,4 +688,67 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .hint-btn { font-size: 15px; padding-inline: 11px; }
   .controls { gap: 6px; }
   .controls button { font-size: 12.5px; padding: 6px 11px; }
+}
+
+/* ---------- מחשב: שולחן עץ וקלפי פליז ----------
+   הגוש הזה חל רק מעל רוחב הטלפון, כדי שגרסת הטלפון תישאר כפי שהיא.
+   הגופנים נשארים כשהיו; מה שמשתנה הוא משפחת הצבע, גימור הקלף,
+   עיגול הפינות של הקלפים, והגלולות של המונים והכפתורים. */
+
+@media (min-width: 521px) {
+  :root {
+    --felt: #2a1c12;
+    --felt-edge: #17100a;
+    --panel: #3d2a1b;
+    --ink: #f7ecdd;
+    --muted: #c3a584;
+    --paper: #b08a52;
+    --paper-ink: #241606;
+    --paper-edge: #8a6a3c;
+    --cat: #7e2e1d;
+    --cat-ink: #ffe8df;
+    --cat-edge: #5a1f12;
+    --back: #4a331e;
+    --back-line: #5d4226;
+    --back-edge: #2c1c0e;
+    --ghost-edge: #6d5436;
+    --accent: #e0b05a;
+    --danger: #e0725c;
+  }
+
+  /* הקלף: פינה בינונית, מסגרת עבה, ושיפוע שנותן לו נפח */
+  .card {
+    border-radius: 8px;
+    border-width: 2px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.34);
+  }
+
+  .card--word {
+    background-image: linear-gradient(160deg, rgba(255, 255, 255, 0.14), rgba(0, 0, 0, 0.10));
+  }
+
+  .card--cat {
+    background-image: linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.18));
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.40);
+  }
+
+  .card--deck {
+    box-shadow: -3px 3px 0 -1px var(--paper), -3px 3px 0 0 var(--paper-edge),
+      -6px 6px 0 -1px var(--paper), -6px 6px 0 0 var(--paper-edge),
+      0 3px 7px rgba(0, 0, 0, 0.34);
+  }
+
+  .ghost { border-radius: 8px; }
+
+  /* המונים והכפתורים כגלולות */
+  .stat,
+  button,
+  .option {
+    border-radius: 999px;
+  }
+
+  .stat { padding: 6px 14px 7px; }
+  .hint-btn { padding-inline: 18px; }
+  .pop { border-radius: 14px; }
+  .pop button { border-radius: 999px; }
 }
