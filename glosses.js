@@ -730,7 +730,11 @@
     'חבורה': 'חבלה בעור לאחר מכה',
     'אגד': 'פלסטר המשמש לחבישה',
     'כמוסה': 'טבליה של תרופה',
-    'לוקה': 'נפגע, ניזוק, חולה, פגום'
+    'לוקה': 'נפגע, ניזוק, חולה, פגום',
+    'גידם': 'מי שידו קטועה',
+    'איטר': 'מי שידו השמאלית חזקה מימינו',
+    'סומא': 'עיוור',
+    'אילם': 'מי שאינו יכול לדבר'
   };
 
   var en = {
@@ -810,8 +814,8 @@
     'mother': 'the female parent',
     'brother': 'a son of the same parents',
     'sister': 'a daughter of the same parents',
-    'grandfather': 'a parent\u05f3s father',
-    'grandmother': 'a parent\u05f3s mother',
+    'grandfather': 'a parent׳s father',
+    'grandmother': 'a parent׳s mother',
     'door': 'the way in and out',
     'window': 'an opening for light and air',
     'roof': 'the cover over a building',
@@ -1495,7 +1499,8 @@
     'רגשות חיוביים': 'ביטויים לנחמה ולשמחה',
     'טיפוסים שליליים': 'כינויים לאופי של אדם',
     'חקלאות': 'מילים הקשורות לחקלאות',
-    'חולי': 'מילים של מחלה ורפואה'
+    'חולי': 'מילים של מחלה ורפואה',
+    'מוגבלות': 'כינויים למוגבלות גופנית'
   };
 
   var catsEn = {
