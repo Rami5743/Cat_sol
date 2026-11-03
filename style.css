@@ -514,6 +514,7 @@ h1 {
 .card--cat .card-text {
   font-family: var(--font-display);
   font-weight: 700;
+  line-height: 1.08;
 }
 
 .card-count {
