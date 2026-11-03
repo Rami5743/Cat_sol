@@ -649,8 +649,12 @@
         continue;
       }
       el.style.fontSize = '';
+      /* שם של קטגוריה אינו עובר שתי שורות, כדי שלא ייצא מן הרצועה הגלויה */
+      var lines = el.closest && el.closest('.card--cat') ? 2 : 0;
       var scale = 1;
-      while (el.scrollWidth > room + 0.5 && scale > 0.56) {
+      while (scale > 0.56 &&
+             (el.scrollWidth > room + 0.5 ||
+              (lines && el.scrollHeight > lines * parseFloat(getComputedStyle(el).lineHeight) + 0.5))) {
         scale -= 0.05;
         el.style.fontSize = (scale * 100) + '%';
       }
